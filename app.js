@@ -92,7 +92,7 @@ function initProcedureDots() {
 
     dot.addEventListener("click", () => {
       proceduresGrid.scrollTo({
-        left: card.offsetLeft - 12,
+        left: card.offsetLeft - 8,
         behavior: "smooth",
       });
     });
@@ -109,7 +109,7 @@ function initProcedureDots() {
 
     cards.forEach((card, index) => {
       const distance = Math.abs(
-        card.getBoundingClientRect().left - gridLeft - 12,
+        card.getBoundingClientRect().left - gridLeft - 8,
       );
 
       if (distance < minDistance) {
@@ -192,7 +192,7 @@ function updateReviewsSlider() {
     const targetCard = reviewCards[reviewsIndex];
     if (targetCard) {
       reviewsTrack.scrollTo({
-        left: targetCard.offsetLeft - 12,
+        left: targetCard.offsetLeft - 8,
         behavior: "smooth",
       });
     }
