@@ -477,6 +477,18 @@ ul {
     grid-template-columns: 1fr;
   }
 }
+@media (max-width: 1180px) {
+  .logo-title {
+    font-size: 18px;
+  }
+  .nav-list,
+  .nav-actions {
+    gap: 15px;
+  }
+  .nav-actions {
+    display: none;
+  }
+}
 
 @media (max-width: 860px) {
   :root {
@@ -2314,4 +2326,10 @@ ul {
 
 .nav-toggle.is-active span:nth-child(3) {
   transform: translateY(-6.5px) rotate(-45deg);
+}
+
+@media (min-width: 859px) {
+  .nav-toggle {
+    display: none;
+  }
 }
