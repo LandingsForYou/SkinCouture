@@ -22,6 +22,7 @@ if (navToggle && siteNav) {
     });
   });
 }
+
 /* modal */
 const modalBackdrop = document.getElementById("modal-backdrop");
 const modalButtons = document.querySelectorAll("[data-modal]");
@@ -64,74 +65,141 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-/* mobile slider dots */
+/* procedures slider */
 const proceduresGrid = document.querySelector(".procedures-grid");
 const proceduresDots = document.querySelector(".procedures-dots");
+const proceduresPrev = document.querySelector(".procedures-arrow--prev");
+const proceduresNext = document.querySelector(".procedures-arrow--next");
 
-let proceduresScrollHandler = null;
+let proceduresIndex = 0;
 
-function initProcedureDots() {
+function getProceduresPerView() {
+  if (window.innerWidth <= 600) return 1;
+  if (window.innerWidth <= 1100) return 2;
+  return 2;
+}
+
+function buildProceduresDots() {
   if (!proceduresGrid || !proceduresDots) return;
+
+  const cards = [...proceduresGrid.querySelectorAll(".procedure-card")];
+  const perView = getProceduresPerView();
+  const pages = Math.max(1, Math.ceil(cards.length / perView));
 
   proceduresDots.innerHTML = "";
 
-  if (proceduresScrollHandler) {
-    proceduresGrid.removeEventListener("scroll", proceduresScrollHandler);
-    proceduresScrollHandler = null;
-  }
-
-  if (window.innerWidth > 600) return;
-
-  const cards = [...proceduresGrid.querySelectorAll(".procedure-card")];
-
-  cards.forEach((card, index) => {
+  for (let i = 0; i < pages; i++) {
     const dot = document.createElement("button");
     dot.type = "button";
 
-    if (index === 0) dot.classList.add("is-active");
+    if (i === proceduresIndex) {
+      dot.classList.add("is-active");
+    }
 
     dot.addEventListener("click", () => {
-      proceduresGrid.scrollTo({
-        left: card.offsetLeft - 8,
-        behavior: "smooth",
-      });
+      proceduresIndex = i;
+      updateProceduresSlider();
+      updateProceduresDots();
     });
 
     proceduresDots.appendChild(dot);
-  });
-
-  const dots = [...proceduresDots.querySelectorAll("button")];
-
-  proceduresScrollHandler = () => {
-    const gridLeft = proceduresGrid.getBoundingClientRect().left;
-    let activeIndex = 0;
-    let minDistance = Infinity;
-
-    cards.forEach((card, index) => {
-      const distance = Math.abs(
-        card.getBoundingClientRect().left - gridLeft - 8,
-      );
-
-      if (distance < minDistance) {
-        minDistance = distance;
-        activeIndex = index;
-      }
-    });
-
-    dots.forEach((dot, index) => {
-      dot.classList.toggle("is-active", index === activeIndex);
-    });
-  };
-
-  proceduresGrid.addEventListener("scroll", proceduresScrollHandler, {
-    passive: true,
-  });
-
-  proceduresScrollHandler();
+  }
 }
 
-window.addEventListener("load", initProcedureDots);
-window.addEventListener("resize", initProcedureDots);
+function updateProceduresDots() {
+  if (!proceduresDots) return;
+
+  const dots = proceduresDots.querySelectorAll("button");
+  dots.forEach((dot, index) => {
+    dot.classList.toggle("is-active", index === proceduresIndex);
+  });
+}
+
+function updateProceduresSlider() {
+  if (!proceduresGrid) return;
+
+  const cards = [...proceduresGrid.querySelectorAll(".procedure-card")];
+  if (!cards.length) return;
+
+  const perView = getProceduresPerView();
+  const pages = Math.max(1, Math.ceil(cards.length / perView));
+
+  if (proceduresIndex > pages - 1) {
+    proceduresIndex = pages - 1;
+  }
+
+  if (window.innerWidth <= 600) {
+    const targetCard = cards[proceduresIndex];
+    if (targetCard) {
+      proceduresGrid.scrollTo({
+        left: targetCard.offsetLeft - 8,
+        behavior: "smooth",
+      });
+    }
+    return;
+  }
+
+  const gap = 24;
+  const cardWidth = cards[0].offsetWidth + gap;
+  const offset = proceduresIndex * cardWidth * perView;
+
+  proceduresGrid.style.transform = `translateX(-${offset}px)`;
+}
+
+if (proceduresPrev) {
+  proceduresPrev.addEventListener("click", () => {
+    if (!proceduresGrid) return;
+
+    const cards = proceduresGrid.querySelectorAll(".procedure-card");
+    const perView = getProceduresPerView();
+    const pages = Math.max(1, Math.ceil(cards.length / perView));
+
+    proceduresIndex = proceduresIndex <= 0 ? pages - 1 : proceduresIndex - 1;
+    updateProceduresSlider();
+    updateProceduresDots();
+  });
+}
+
+if (proceduresNext) {
+  proceduresNext.addEventListener("click", () => {
+    if (!proceduresGrid) return;
+
+    const cards = proceduresGrid.querySelectorAll(".procedure-card");
+    const perView = getProceduresPerView();
+    const pages = Math.max(1, Math.ceil(cards.length / perView));
+
+    proceduresIndex = proceduresIndex >= pages - 1 ? 0 : proceduresIndex + 1;
+    updateProceduresSlider();
+    updateProceduresDots();
+  });
+}
+
+if (window.innerWidth <= 600 && proceduresGrid) {
+  proceduresGrid.addEventListener(
+    "scroll",
+    () => {
+      const cards = [...proceduresGrid.querySelectorAll(".procedure-card")];
+      const gridLeft = proceduresGrid.getBoundingClientRect().left;
+      let activeIndex = 0;
+      let minDistance = Infinity;
+
+      cards.forEach((card, index) => {
+        const distance = Math.abs(
+          card.getBoundingClientRect().left - gridLeft - 8,
+        );
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          activeIndex = index;
+        }
+      });
+
+      proceduresIndex = activeIndex;
+      updateProceduresDots();
+    },
+    { passive: true },
+  );
+}
 
 /* reviews slider */
 const reviewsTrack = document.querySelector(".reviews-track");
@@ -199,7 +267,7 @@ function updateReviewsSlider() {
     return;
   }
 
-  const gap = window.innerWidth <= 1100 ? 24 : 24;
+  const gap = 24;
   const cardWidth = reviewCards[0].offsetWidth + gap;
   const offset = reviewsIndex * cardWidth * perView;
   reviewsTrack.style.transform = `translateX(-${offset}px)`;
@@ -253,12 +321,21 @@ if (window.innerWidth <= 600 && reviewsTrack) {
   );
 }
 
+/* init */
 window.addEventListener("load", () => {
+  buildProceduresDots();
+  updateProceduresSlider();
+  updateProceduresDots();
+
   buildReviewsDots();
   updateReviewsSlider();
 });
 
 window.addEventListener("resize", () => {
+  buildProceduresDots();
+  updateProceduresSlider();
+  updateProceduresDots();
+
   buildReviewsDots();
   updateReviewsSlider();
 });

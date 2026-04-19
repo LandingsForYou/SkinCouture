@@ -1213,7 +1213,25 @@ ul {
 }
 
 .procedures-dots {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.procedures-dots button {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(91, 116, 84, 0.22);
+  border: none;
+  padding: 0;
+  transition: all 0.25s ease;
+}
+
+.procedures-dots button.is-active {
+  width: 24px;
+  border-radius: 999px;
+  background: var(--color-green-700);
 }
 
 .procedure-card__link {
@@ -1389,7 +1407,6 @@ ul {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 18px;
   }
 
   .procedures-dots button {
@@ -2331,5 +2348,47 @@ ul {
 @media (min-width: 859px) {
   .nav-toggle {
     display: none;
+  }
+}
+
+.procedures-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.procedures-arrow {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(91, 116, 84, 0.14);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--color-text);
+  font-size: 22px;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.procedures-arrow:hover {
+  transform: translateY(-2px);
+  background: rgba(234, 242, 226, 0.95);
+  box-shadow: 0 14px 28px rgba(91, 116, 84, 0.12);
+}
+@media (max-width: 600px) {
+  .procedures-controls {
+    margin-top: 18px;
+    gap: 14px;
+  }
+
+  .procedures-arrow {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
   }
 }
