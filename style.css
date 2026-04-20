@@ -555,6 +555,12 @@ ul {
     margin: -90px 20px 0;
     padding: 36px 30px;
   }
+  .nav-actions {
+    display: flex;
+  }
+  .hero-panel::before {
+    background: transparent !important;
+  }
 }
 
 .ticker {
